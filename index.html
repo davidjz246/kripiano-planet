@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kripiano Planet — Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  // 1) Paste your Google Sheet "Publish to web" CSV link here.
+  const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSQAY-8IIreQQgxGALYupQdQ9PDl-yoddFueZmW7AB0RXcCw79P_LdbwnVuKZHlvIIcSydw8bFLF3bl/pub?gid=0&single=true&output=csv";
+
+  // 2) Currency label shown next to each price.
+  const CURRENCY = { en: "EGP", ar: "ج.م" };
+
+</script>
+<style>
+  :root{
+    --bg:#15110c;
+    --bg-line: rgba(255,255,255,0.035);
+    --card:#241c13;
+    --card-border:#4d3c24;
+    --gold:#f0a93e;
+    --gold2:#ffcf6b;
+    --gold-deep:#c2791a;
+    --cream:#fff3dd;
+    --text:#fbefdd;
+    --muted:#b19a78;
+    --radius:16px;
+    --badge-bg:#e03b2e;
+    --badge-text:#fff6ec;
+  }
+  html[data-theme="light"]{
+    --bg:#fff8ec;
+    --bg-line: rgba(140,100,30,0.06);
+    --card:#ffffff;
+    --card-border:#f0ddb8;
+    --gold:#d9821a;
+    --gold2:#f2a93a;
+    --gold-deep:#a8620f;
+    --cream:#2a1c0d;
+    --text:#2e2211;
+    --muted:#8a6f47;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:'Cairo',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    transition:background .25s ease, color .25s ease;
+  }
+  body{
+    background-image:
+      repeating-linear-gradient(135deg, var(--bg-line) 0 1px, transparent 1px 46px),
+      repeating-linear-gradient(45deg, var(--bg-line) 0 1px, transparent 1px 46px);
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  [dir="rtl"]{ font-family:'Cairo',sans-serif; }
+
+  .wrap{ max-width:560px; margin:0 auto; padding:26px 20px 60px; }
+
+  /* ---- header ---- */
+  .topbar{ display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px; }
+  .pill-btn{
+    background:var(--card); border:1px solid var(--card-border); color:var(--muted);
+    font-family:'Cairo',sans-serif; font-weight:600; font-size:13px;
+    padding:7px 14px; border-radius:999px; cursor:pointer; letter-spacing:.03em;
+  }
+  .pill-btn:hover{ border-color:var(--gold); color:var(--gold); }
+
+  .brand{ text-align:center; margin:14px 0 6px; position:relative; }
+  .logo-glow{
+    position:absolute; left:50%; top:10px; transform:translateX(-50%);
+    width:220px; height:120px; background:radial-gradient(ellipse, rgba(240,169,62,.45), transparent 70%);
+    filter:blur(6px); z-index:0; pointer-events:none;
+  }
+  .logo-pill{
+    position:relative; z-index:1; display:inline-block; background:#0e0c09;
+    border:2.5px solid var(--gold); border-radius:999px; padding:15px 36px 11px;
+    cursor:default; user-select:none; box-shadow:0 0 0 1px rgba(255,255,255,.04), 0 10px 30px rgba(0,0,0,.35);
+    transition:transform .15s ease;
+  }
+  .logo-pill:active{ transform:scale(.97); }
+  .logo-pill .word{
+    font-family:'Playfair Display',serif; font-weight:800; font-size:clamp(27px,7.5vw,36px);
+    background:linear-gradient(180deg, var(--gold2), var(--gold));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:.01em; white-space:nowrap;
+  }
+  .logo-pill .swash{ width:60%; height:2px; background:linear-gradient(90deg, transparent, var(--gold2), transparent); margin:5px auto 0; border-radius:2px;}
+  .tagline{
+    margin-top:14px; font-size:12px; letter-spacing:.3em; color:var(--gold);
+    text-transform:uppercase; font-weight:700;
+  }
+  [dir="rtl"] .tagline{ letter-spacing:.06em; text-transform:none; }
+
+  .notice{
+    margin:22px 0; padding:12px 16px; border:1px dashed var(--card-border);
+    border-radius:var(--radius); color:var(--muted); font-size:13px; text-align:center;
+  }
+
+  .catnav-wrap{ position:sticky; top:env(safe-area-inset-top,0px); z-index:20; margin:0 -20px; padding:10px 20px; background:var(--bg); backdrop-filter:blur(8px); border-bottom:1px solid var(--card-border); }
+  .catnav{ display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
+  .catnav::-webkit-scrollbar{ display:none; }
+  .catnav button{
+    flex-shrink:0; background:var(--card); border:1px solid var(--card-border); color:var(--muted);
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:12.5px; padding:8px 15px;
+    border-radius:999px; cursor:pointer; white-space:nowrap; transition:all .15s ease;
+  }
+  .catnav button.active{ background:linear-gradient(135deg, var(--gold2), var(--gold-deep)); border-color:var(--gold); color:#1a1410; box-shadow:0 2px 10px rgba(240,169,62,.4); }
+
+  /* ---- slider ---- */
+  .slider-shell{ position:relative; margin-top:18px; }
+  .slider{
+    display:flex; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain;
+    margin:0 -20px;
+  }
+  .slider::-webkit-scrollbar{ display:none; }
+  .category{ flex:0 0 100%; min-width:0; scroll-snap-align:start; scroll-snap-stop:always; padding:6px 20px 0; align-self:flex-start; }
+  .category .item:last-child{ margin-bottom:0; }
+  .category h2{
+    font-family:'Playfair Display',serif; font-weight:800; font-size:22px;
+    background:linear-gradient(135deg, var(--gold2), var(--gold-deep));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    margin:0 0 15px; display:flex; align-items:center; gap:10px;
+  }
+  .category h2 .count{ font-family:'Cairo',sans-serif; font-size:12px; font-weight:700; color:var(--muted); -webkit-text-fill-color:var(--muted); }
+  .category h2::after{ content:""; flex:1; height:2px; background:linear-gradient(90deg, var(--card-border), transparent); order:5; }
+  [dir="rtl"] .category h2::after{ background:linear-gradient(270deg, var(--card-border), transparent); }
+  .slider-nav{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin:14px 0 0; }
+  .arrow{
+    width:42px; height:42px; border-radius:50%; flex-shrink:0; cursor:pointer;
+    background:var(--card); border:1px solid var(--card-border); color:var(--gold);
+    font-size:18px; line-height:1; display:grid; place-items:center; transition:all .15s ease;
+  }
+  .arrow:hover:not(:disabled){ border-color:var(--gold); background:var(--gold); color:#1a1410; }
+  .arrow:disabled{ opacity:.3; cursor:default; }
+  [dir="rtl"] .arrow span{ display:inline-block; transform:scaleX(-1); }
+  .dots{ display:flex; flex-wrap:wrap; justify-content:center; gap:7px; flex:1; }
+  .dots i{ width:7px; height:7px; border-radius:99px; background:var(--card-border); transition:all .25s ease; cursor:pointer; }
+  .dots i.active{ width:22px; background:linear-gradient(90deg, var(--gold2), var(--gold-deep)); }
+  .item-size{ display:inline-block; }
+
+  .item{
+    display:flex; gap:13px; padding:14px; margin-bottom:10px; align-items:center;
+    background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .item:active{ transform:scale(.985); }
+  .item-imgwrap{ position:relative; flex-shrink:0; }
+  .item-img{ width:68px; height:68px; border-radius:12px; object-fit:cover; background:var(--bg); border:1px solid var(--card-border); display:block; }
+  .item-badge{
+    position:absolute; top:-8px; left:-8px; background:var(--badge-bg); color:var(--badge-text);
+    font-size:9.5px; font-weight:800; padding:3px 7px; border-radius:999px; white-space:nowrap;
+    box-shadow:0 2px 6px rgba(0,0,0,.35); letter-spacing:.02em;
+  }
+  [dir="rtl"] .item-badge{ left:auto; right:-8px; }
+  .item-main{ flex:1; min-width:0; }
+  .item-name{ font-size:16.5px; font-weight:700; color:var(--text); }
+  .item-desc{ font-size:13px; color:var(--muted); margin-top:3px; line-height:1.5; }
+  .price{
+    flex-shrink:0; background:linear-gradient(135deg, var(--gold2), var(--gold-deep)); color:#1a1410;
+    font-weight:800; font-size:14px; padding:7px 14px; border-radius:999px; white-space:nowrap;
+    box-shadow:0 3px 10px rgba(240,169,62,.3);
+  }
+
+  .delivery{
+    margin-top:22px; background:var(--card); border:1px solid var(--card-border);
+    border-radius:var(--radius); padding:22px 22px 20px;
+  }
+  .delivery h3{ font-family:'Playfair Display',serif; font-size:19px; margin:0 0 14px; color:var(--gold); font-weight:800; }
+  .delivery .label{ font-size:11px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase; }
+  .delivery .nums{ font-weight:700; font-size:16px; margin:4px 0 12px; }
+  .delivery .addr{ font-size:14px; color:var(--text); margin-top:10px; line-height:1.6; }
+
+  footer{ text-align:center; margin-top:40px; font-size:11px; color:var(--muted); opacity:.6; }
+
+  @media print{
+    .topbar,.catnav-wrap,.notice{ display:none !important; }
+    body{ background:#fff; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <button class="pill-btn" id="themeToggle" onclick="toggleTheme()">☀️</button>
+    <button class="pill-btn" id="langToggle" onclick="toggleLang()">العربية</button>
+  </div>
+
+  <div class="brand">
+    <div class="logo-glow"></div>
+    <div class="logo-pill" id="logoPill">
+      <div class="word">Kripiano Planet</div>
+      <div class="swash"></div>
+    </div>
+    <div class="tagline" data-en="Taste Your Happiness" data-ar="ذوق سعادتك">Taste Your Happiness</div>
+  </div>
+
+  <div id="notice" class="notice" style="display:none;"></div>
+
+  <div class="catnav-wrap" id="catnavWrap" style="display:none;">
+    <div class="catnav" id="catnav"></div>
+  </div>
+
+  <div class="slider-shell">
+    <div class="slider" id="menu"></div>
+    <div class="slider-nav" id="sliderNav" style="display:none;">
+      <button class="arrow" id="prevBtn" aria-label="Previous category"><span>&#10094;</span></button>
+      <div class="dots" id="dots"></div>
+      <button class="arrow" id="nextBtn" aria-label="Next category"><span>&#10095;</span></button>
+    </div>
+  </div>
+
+  <div class="delivery">
+    <h3 data-en="Delivery" data-ar="التوصيل">Delivery</h3>
+    <div class="label" data-en="Hotline" data-ar="الخط الساخن">Hotline</div>
+    <div class="nums">01040333493 · 01029912266 · 01029912142</div>
+    <div class="label" data-en="Landline" data-ar="الأرضي">Landline</div>
+    <div class="nums">02 25969997</div>
+    <div class="addr">
+      <span data-en="42 Hamdi St., El Daher" data-ar="٤٢ شارع حمدي - الظاهر">42 Hamdi St., El Daher</span>
+    </div>
+  </div>
+
+  <footer>Kripiano Planet</footer>
+</div>
+
+<script>
+let lang = 'en';
+let rows = [];
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const isLight = html.getAttribute('data-theme') === 'light';
+  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+  try{ localStorage.setItem('kripiano-theme', isLight ? 'dark' : 'light'); }catch(e){}
+}
+(function initTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem('kripiano-theme'); }catch(e){}
+  if(saved === 'light'){
+    document.documentElement.setAttribute('data-theme','light');
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('themeToggle').textContent = saved === 'light' ? '🌙' : '☀️';
+  });
+})();
+
+function toggleLang(){
+  lang = lang === 'en' ? 'ar' : 'en';
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('langToggle').textContent = lang === 'en' ? 'العربية' : 'English';
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    el.textContent = el.getAttribute('data-'+lang);
+  });
+  renderMenu();
+}
+
+function parseCSV(text){
+  const rows = []; let row = []; let field = ''; let inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field+='"'; i++; } else { inQuotes = false; }
+      } else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ row.push(field); field=''; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c === '\r'){ /* skip */ }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(c => c.trim() !== ''));
+}
+
+function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g,'-').replace(/(^-|-$)/g,''); }
+
+// ---- Arabic names for categories (the sheet only has English category names). Add new categories here. ----
+const CATEGORY_AR = {
+  'new':'جديد', 'appetizer':'مقبلات', 'extra':'إضافات', 'sweet krip':'سويت كريب',
+  'soft drink':'مشروبات غازية', 'fish krip':'كريب سمك', 'fish mix':'ميكس سمك',
+  'cheese krip':'كريب جبنة', 'vegetables krip':'كريب خضار', 'mix':'ميكس',
+  'meat krip':'كريب لحوم', 'chicken krip':'كريب فراخ'
+};
+
+const HIDDEN_STATUS = /^(n|no|hide|hidden|unavail|not|sold|out|off)/i;
+let slideRO = null, groupKeys = [];
+let lockTarget = null, lockUntil = 0;
+let current = 0, slideEls = [], navButtons = [], dotEls = [];
+
+function driveImg(u){
+  const m = u && u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]+)/);
+  return m ? 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w300' : u;
+}
+
+let currentKey = null;
+function renderMenu(){
+  const keepY = window.scrollY;
+  const el = document.getElementById('menu');
+  const nav = document.getElementById('catnav');
+  el.innerHTML = ''; nav.innerHTML = '';
+  const groups = [];
+  rows.forEach(r=>{
+    if(!r.name && !r.arname) return;
+    if(r.status && HIDDEN_STATUS.test(r.status)) return;
+    const key = r.category || 'Menu';
+    let g = groups.find(x=>x.key===key);
+    if(!g){ g = { key, items:[] }; groups.push(g); }
+    g.items.push(r);
+  });
+  const catName = g => lang==='ar' ? (CATEGORY_AR[g.key.toLowerCase()] || g.key) : g.key;
+
+  document.getElementById('catnavWrap').style.display = groups.length > 1 ? 'block' : 'none';
+  document.getElementById('sliderNav').style.display = groups.length > 1 ? 'flex' : 'none';
+  const dots = document.getElementById('dots'); dots.innerHTML = '';
+
+  groups.forEach((g, idx)=>{
+    const navBtn = document.createElement('button');
+    navBtn.textContent = catName(g);
+    navBtn.onclick = ()=> goTo(idx);
+    nav.appendChild(navBtn);
+
+    const dot = document.createElement('i');
+    dot.onclick = ()=> goTo(idx);
+    dots.appendChild(dot);
+
+    const section = document.createElement('section');
+    section.className = 'category';
+    section.id = 'cat-' + idx;
+    const h2 = document.createElement('h2');
+    h2.textContent = catName(g);
+    const cnt = document.createElement('span'); cnt.className = 'count'; cnt.textContent = g.items.length;
+    h2.appendChild(cnt);
+    section.appendChild(h2);
+
+    g.items.forEach(r=>{
+      const name = lang==='ar' ? (r.arname || r.name) : (r.name || r.arname);
+      const desc = r.description;
+      const img = driveImg(r.photo);
+      const item = document.createElement('div');
+      item.className = 'item';
+      item.innerHTML = (img ? '<div class="item-imgwrap"><img class="item-img" alt="" loading="lazy"></div>' : '') +
+        '<div class="item-main"><div class="item-name"></div>' + (desc ? '<div class="item-desc"></div>' : '') + '</div>' +
+        '<div class="price"></div>';
+      item.querySelector('.item-name').textContent = name;
+      if(desc) item.querySelector('.item-desc').textContent = desc;
+      if(img){
+        const im = item.querySelector('img'); im.src = img;
+        im.onerror = ()=> im.parentElement.remove();
+      }
+      item.querySelector('.price').textContent = (r.price || '') + ' ' + CURRENCY[lang];
+      section.appendChild(item);
+    });
+    el.appendChild(section);
+  });
+
+  groupKeys = groups.map(g=>g.key);
+  slideEls = Array.from(el.children);
+  if(slideRO) slideRO.disconnect();
+  if(window.ResizeObserver){ slideRO = new ResizeObserver(fitHeight); slideEls.forEach(s=>slideRO.observe(s)); }
+  navButtons = Array.from(nav.children);
+  dotEls = Array.from(dots.children);
+  const ki = groupKeys.indexOf(currentKey);
+  current = ki >= 0 ? ki : Math.min(current, Math.max(slideEls.length-1, 0));
+  lockTarget = current; lockUntil = Date.now() + 800;
+  jump(current);
+  window.scrollTo(0, keepY);
+}
+
+function slideDelta(i){
+  const track = document.getElementById('menu');
+  return slideEls[i].getBoundingClientRect().left - track.getBoundingClientRect().left;
+}
+function jump(i){
+  const track = document.getElementById('menu');
+  if(!slideEls[i]) return;
+  track.style.scrollSnapType = 'none';
+  track.scrollBy({left: slideDelta(i), behavior:'instant'});
+  requestAnimationFrame(()=>{ track.style.scrollSnapType = ''; });
+  setActive(i);
+}
+function goTo(i){
+  i = Math.max(0, Math.min(slideEls.length-1, i));
+  lockTarget = i; lockUntil = Date.now() + 1500;
+  document.getElementById('menu').scrollBy({left: slideDelta(i), behavior:'smooth'});
+  setActive(i);
+  const top = document.querySelector('.slider-shell').getBoundingClientRect().top + window.scrollY - (document.getElementById('catnavWrap').offsetHeight + 10);
+  if(window.scrollY > top) window.scrollTo({top, behavior:'smooth'});
+}
+function setActive(i){
+  current = i; currentKey = groupKeys[i];
+  navButtons.forEach((b,k)=>b.classList.toggle('active', k===i));
+  dotEls.forEach((d,k)=>d.classList.toggle('active', k===i));
+  document.getElementById('prevBtn').disabled = i <= 0;
+  document.getElementById('nextBtn').disabled = i >= slideEls.length-1;
+  const b = navButtons[i];
+  if(b){ const n = document.getElementById('catnav'); n.scrollTo({left: n.scrollLeft + (b.getBoundingClientRect().left - n.getBoundingClientRect().left) - (n.clientWidth - b.offsetWidth)/2, behavior:'smooth'}); }
+  fitHeight();
+}
+// the track is only as tall as the slide you are looking at
+function fitHeight(){
+  const track = document.getElementById('menu');
+  if(slideEls[current]) track.style.height = slideEls[current].getBoundingClientRect().height + 'px';
+}
+(function initSlider(){
+  const track = document.getElementById('menu');
+  let t = null;
+  track.addEventListener('scroll', ()=>{
+    clearTimeout(t);
+    t = setTimeout(()=>{
+      if(lockTarget !== null){
+        if(Date.now() < lockUntil && Math.abs(slideDelta(lockTarget)) > 2){ track.dispatchEvent(new Event('scroll')); return; }
+        lockTarget = null; return;
+      }
+      let best = 0, bd = Infinity;
+      slideEls.forEach((s,i)=>{ const d = Math.abs(slideDelta(i)); if(d < bd){ bd = d; best = i; } });
+      if(best !== current) setActive(best);
+    }, 90);
+  }, {passive:true});
+  document.getElementById('prevBtn').onclick = ()=> goTo(current-1);
+  document.getElementById('nextBtn').onclick = ()=> goTo(current+1);
+  window.addEventListener('resize', ()=>{ jump(current); });
+  window.addEventListener('load', fitHeight);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitHeight);
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'ArrowRight') goTo(current + (document.dir==='rtl' ? -1 : 1));
+    if(e.key === 'ArrowLeft')  goTo(current + (document.dir==='rtl' ? 1 : -1));
+  });
+  
+})();
+
+// Sheet columns: Category | Name | Arabic name | Description | Price | Status | Photo link
+// Headers are matched loosely (case / spaces / underscores ignored) so small renames in the sheet won't break the menu.
+const COLS = {
+  category:['category','categoryen','cat'], name:['name','itemen','item','nameen'],
+  arname:['arabicname','namear','itemar','arabic'], description:['description','descriptionen','desc'],
+  price:['price'], status:['status','available'], photo:['photolink','photo','image','imageurl']
+};
+function normalizeRow(raw){
+  const flat = {};
+  Object.keys(raw).forEach(k=> flat[k.toLowerCase().replace(/[^a-z]/g,'')] = (raw[k]||'').toString().trim());
+  const o = {};
+  Object.keys(COLS).forEach(f=>{ const k = COLS[f].find(a=>flat[a] !== undefined); o[f] = k ? flat[k] : ''; });
+  return o;
+}
+function csvToObjects(csv){
+  const table = parseCSV(csv);
+  const headers = table[0].map(h=>h.trim());
+  return table.slice(1).map(r=>{
+    const o = {};
+    headers.forEach((h,i)=> o[h] = (r[i]||'').trim());
+    return normalizeRow(o);
+  });
+}
+
+// Offline copy of the sheet (used only if the live sheet can't be loaded).
+const FALLBACK_ROWS = [{"Category":"Appetizer","Name":"Packet Fries","Arabic name":"باكت بطاطس","Description":"","Price":"30","Status":"Available","Photo link":""},{"Category":"Appetizer","Name":"Packet Fries Cheddar","Arabic name":"باكت بطاطس شيدر","Description":"","Price":"40","Status":"Available","Photo link":""},{"Category":"Appetizer","Name":"Packet Fries Big Teste","Arabic name":"باكت بطاطس بيج تست","Description":"","Price":"40","Status":"Available","Photo link":""},{"Category":"Appetizer","Name":"Coleslaw Salad","Arabic name":"سلطة كولسلو","Description":"","Price":"30","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Mozzarella / Roomi / Cheddar","Arabic name":"اضافة موتزاريلا / رومي / شيدر","Description":"","Price":"20","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Any Piece of Meat","Arabic name":"اضافة اى قطعة لحوم","Description":"","Price":"30","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Shawerma","Arabic name":"اضافة شاورما","Description":"","Price":"40","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Shish / Crispy","Arabic name":"اضافة شيش / كرسبي","Description":"","Price":"40","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Egg","Arabic name":"اضافة بيض","Description":"","Price":"15","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Potato","Arabic name":"اضافة بطاطس","Description":"","Price":"20","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Mushroom","Arabic name":"اضافة مشروم","Description":"","Price":"20","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Nutella","Arabic name":"اضافة نوتيلا","Description":"","Price":"25","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Banana / Nuts","Arabic name":"اضافة موز / مكسرات","Description":"","Price":"20","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Mayonnaise","Arabic name":"مايونيز","Description":"","Price":"15","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Ketchup","Arabic name":"كاتشب","Description":"","Price":"15","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Sauce Ranch","Arabic name":"صوص رانش","Description":"","Price":"15","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Sauce Big Teste","Arabic name":"صوص بيج تست","Description":"","Price":"15","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Sauce BBQ","Arabic name":"صوص باربكيو","Description":"","Price":"15","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Sauce Sweet Chili","Arabic name":"صوص سويت شيلي","Description":"","Price":"15","Status":"Available","Photo link":""},{"Category":"Extra","Name":"Pickled Jalapenos","Arabic name":"فلفل هالبينو","Description":"","Price":"10","Status":"Available","Photo link":""},{"Category":"Sweet Krip","Name":"Fettuccine Crepe (Mix Sauce)","Arabic name":"فوتشيني كريب (ميكس صوصات)","Description":"","Price":"60","Status":"Available","Photo link":""},{"Category":"Sweet Krip","Name":"Mini Pancakes (16 Pieces)","Arabic name":"ميني بان كيك (16 قطعة)","Description":"","Price":"60","Status":"Available","Photo link":""},{"Category":"Sweet Krip","Name":"Nutella","Arabic name":"نوتيلا","Description":"","Price":"60","Status":"Available","Photo link":""},{"Category":"Sweet Krip","Name":"White Chocolate","Arabic name":"شيكولاتة بيضاء","Description":"","Price":"60","Status":"Available","Photo link":""},{"Category":"Sweet Krip","Name":"Lotus","Arabic name":"لوتس","Description":"","Price":"60","Status":"Available","Photo link":""},{"Category":"Sweet Krip","Name":"Mix Chocolate","Arabic name":"ميكس شيكولاتة","Description":"","Price":"60","Status":"Available","Photo link":""},{"Category":"Sweet Krip","Name":"Waffle","Arabic name":"وافل","Description":"","Price":"60","Status":"Available","Photo link":""},{"Category":"New","Name":"Crazy Kripiano Cup","Arabic name":"كريزى كريبيانو كب كان","Description":"Fries + chicken strip pieces + cheddar + sauce of your choice + drink","Price":"75","Status":"Available","Photo link":""},{"Category":"New","Name":"Crazy Box Kripiano","Arabic name":"كريزى بوكس كريبيانو","Description":"Fries + jalapenos + chicken strip pieces + cheddar + sauce of your choice","Price":"100","Status":"Available","Photo link":""},{"Category":"New","Name":"Crazy Fries Kripiano (To Go)","Arabic name":"كريزى بطاطس كريبيانو (تيك اواى)","Description":"Fries + sauce of your choice","Price":"25","Status":"Available","Photo link":""},{"Category":"Soft Drink","Name":"Soft Drink Can (Pepsi / Miranda / 7Up)","Arabic name":"كانز (بيبسي / ميرندا / سفن)","Description":"","Price":"15","Status":"Available","Photo link":""},{"Category":"Soft Drink","Name":"Mineral Water Small","Arabic name":"مياه معدنية صغيرة","Description":"","Price":"7","Status":"Available","Photo link":""},{"Category":"Soft Drink","Name":"Mineral Water Large","Arabic name":"مياه معدنية كبيرة","Description":"","Price":"10","Status":"Available","Photo link":""},{"Category":"Fish Krip","Name":"Tuna","Arabic name":"تونة","Description":"","Price":"85","Status":"Available","Photo link":""},{"Category":"Fish Krip","Name":"Filet Fish","Arabic name":"سمك فيليه","Description":"","Price":"150","Status":"Available","Photo link":""},{"Category":"Fish Krip","Name":"Calamari","Arabic name":"سبيط","Description":"","Price":"150","Status":"Available","Photo link":""},{"Category":"Fish Krip","Name":"Shrimp","Arabic name":"جمبري","Description":"","Price":"180","Status":"Available","Photo link":""},{"Category":"Fish Krip","Name":"Grilled Shrimp","Arabic name":"جمبري مشوي","Description":"","Price":"200","Status":"Available","Photo link":""},{"Category":"Fish Mix","Name":"Tuna + Fries","Arabic name":"تونة + بطاطس","Description":"","Price":"110","Status":"Available","Photo link":""},{"Category":"Fish Mix","Name":"Fish + Calamari","Arabic name":"سمك + سبيط","Description":"","Price":"150","Status":"Available","Photo link":""},{"Category":"Fish Mix","Name":"Fish + Shrimp","Arabic name":"سمك + جمبري","Description":"","Price":"160","Status":"Available","Photo link":""},{"Category":"Fish Mix","Name":"Calamari + Shrimp","Arabic name":"سبيط + جمبري","Description":"","Price":"175","Status":"Available","Photo link":""},{"Category":"Fish Mix","Name":"Fish + Shrimp + Calamari","Arabic name":"سمك + جمبري + سبيط","Description":"","Price":"190","Status":"Available","Photo link":""},{"Category":"Fish Mix","Name":"Grilled Shrimp + Mushroom","Arabic name":"جمبري مشوي + مشروم","Description":"","Price":"225","Status":"Available","Photo link":""},{"Category":"Fish Mix","Name":"Fried Shrimp + Mushroom","Arabic name":"جمبري مقلي + مشروم","Description":"","Price":"200","Status":"Available","Photo link":""},{"Category":"Cheese Krip","Name":"Roomi Cheese – Large","Arabic name":"جبنة رومي - كبير","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Cheese Krip","Name":"Roomi Cheese – Small","Arabic name":"جبنة رومي - صغير","Description":"","Price":"70","Status":"Available","Photo link":""},{"Category":"Cheese Krip","Name":"Mozzarella Cheese – Large","Arabic name":"جبنة موتزاريلا - كبير","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Cheese Krip","Name":"Mozzarella Cheese – Small","Arabic name":"جبنة موتزاريلا - صغير","Description":"","Price":"70","Status":"Available","Photo link":""},{"Category":"Cheese Krip","Name":"Cheddar Cheese – Large","Arabic name":"جبنة شيدر - كبير","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Cheese Krip","Name":"Cheddar Cheese – Small","Arabic name":"جبنة شيدر - صغير","Description":"","Price":"70","Status":"Available","Photo link":""},{"Category":"Vegetables Krip","Name":"Fries – Large","Arabic name":"بطاطس - كبير","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Vegetables Krip","Name":"Fries – Small","Arabic name":"بطاطس - صغير","Description":"","Price":"60","Status":"Available","Photo link":""},{"Category":"Vegetables Krip","Name":"Mushroom – Large","Arabic name":"مشروم - كبير","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Vegetables Krip","Name":"Mushroom – Small","Arabic name":"مشروم - صغير","Description":"","Price":"70","Status":"Available","Photo link":""},{"Category":"Vegetables Krip","Name":"Fries + Mushroom – Large","Arabic name":"بطاطس + مشروم - كبير","Description":"","Price":"100","Status":"Available","Photo link":""},{"Category":"Vegetables Krip","Name":"Fries + Mushroom – Small","Arabic name":"بطاطس + مشروم - صغير","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Hay Grill","Arabic name":"هاي جريل","Description":"Shish Tawook + Haty Kofta + Mozzarella","Price":"125","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Hay Chicken","Arabic name":"هاي تشيكن","Description":"Shish Tawook + Crispy + Mozzarella","Price":"135","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Mix Chicken","Arabic name":"ميكس تشيكن","Description":"Shish Tawook + Fried (Pane) + Mozzarella","Price":"110","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Mix Super Chicken","Arabic name":"ميكس سوبر تشيكن","Description":"Shish Tawook + Fried + Crispy + Mozzarella","Price":"115","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Hay Mix Super Chicken","Arabic name":"هاي مكس سوبر تشيكن","Description":"Shish Tawook + Fried + Crispy + Smoked Turkey + Mozzarella","Price":"140","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Mix Super Chicken Jumbo","Arabic name":"ميكس سوبر تشيكن جامبو","Description":"Shish Tawook + Fried + Crispy + Smoked Turkey + Beef Hotdog + Mozzarella","Price":"150","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Mix Beef","Arabic name":"ميكس لحمة","Description":"Beef Burger + Hotdog + Mozzarella","Price":"100","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Super Mix Beef","Arabic name":"سوبر ميكس لحمة","Description":"Beef Burger + Hotdog + Sausages + Kofta + Mozzarella","Price":"110","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Mix Beef Jumbo","Arabic name":"ميكس لحمة جامبو","Description":"Beef Burger + Hotdog + Sausages + Kofta + Minced Meat + Liver + Mozzarella","Price":"130","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Shawerma Mix","Arabic name":"ميكس شاورما","Description":"Beef Shawerma + Chicken Shawerma + Mozzarella","Price":"155","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Meat / Chicken Fajita","Arabic name":"فاهيتا لحمة / فراخ","Description":"Beef or Chicken + Mushroom + Mozzarella","Price":"150","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Mix Cheese","Arabic name":"ميكس جبنة","Description":"Roomi + Cheddar + Kiri + Mozzarella","Price":"105","Status":"Available","Photo link":""},{"Category":"Mix","Name":"Mix Doner Crunchy","Arabic name":"ميكس دونر كرانشي","Description":"Crispy + Doner Kebab + Texas Sauce + Mozzarella","Price":"170","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Burger – Large w/ Mozzarella","Arabic name":"برجر لحم - كبير مع موتزاريلا","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Burger – Large","Arabic name":"برجر لحم - كبير","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Burger – Small w/ Mozzarella","Arabic name":"برجر لحم - صغير مع موتزاريلا","Description":"","Price":"75","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Burger – Small","Arabic name":"برجر لحم - صغير","Description":"","Price":"65","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Burger with Egg – Large w/ Mozzarella","Arabic name":"برجر بالبيض - كبير مع موتزاريلا","Description":"","Price":"95","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Burger with Egg – Large","Arabic name":"برجر بالبيض - كبير","Description":"","Price":"85","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Burger with Egg – Small w/ Mozzarella","Arabic name":"برجر بالبيض - صغير مع موتزاريلا","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Burger with Egg – Small","Arabic name":"برجر بالبيض - صغير","Description":"","Price":"70","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Hotdog – Large w/ Mozzarella","Arabic name":"سوسيس لحم - كبير مع موتزاريلا","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Hotdog – Large","Arabic name":"سوسيس لحم - كبير","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Hotdog – Small w/ Mozzarella","Arabic name":"سوسيس لحم - صغير مع موتزاريلا","Description":"","Price":"75","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Hotdog – Small","Arabic name":"سوسيس لحم - صغير","Description":"","Price":"65","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Eastern Sausage – Large w/ Mozzarella","Arabic name":"سجق شرقي - كبير مع موتزاريلا","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Eastern Sausage – Large","Arabic name":"سجق شرقي - كبير","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Eastern Sausage – Small w/ Mozzarella","Arabic name":"سجق شرقي - صغير مع موتزاريلا","Description":"","Price":"75","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Eastern Sausage – Small","Arabic name":"سجق شرقي - صغير","Description":"","Price":"65","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Alexandrian Liver – Large w/ Mozzarella","Arabic name":"كبدة اسكندراني - كبير مع موتزاريلا","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Alexandrian Liver – Large","Arabic name":"كبدة اسكندراني - كبير","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Alexandrian Liver – Small w/ Mozzarella","Arabic name":"كبدة اسكندراني - صغير مع موتزاريلا","Description":"","Price":"75","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Alexandrian Liver – Small","Arabic name":"كبدة اسكندراني - صغير","Description":"","Price":"65","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Chopped Beef – Large w/ Mozzarella","Arabic name":"لحمة مفرومة - كبير مع موتزاريلا","Description":"","Price":"100","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Chopped Beef – Large","Arabic name":"لحمة مفرومة - كبير","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Chopped Beef – Small w/ Mozzarella","Arabic name":"لحمة مفرومة - صغير مع موتزاريلا","Description":"","Price":"85","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Chopped Beef – Small","Arabic name":"لحمة مفرومة - صغير","Description":"","Price":"75","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Kofta Haty – Large w/ Mozzarella","Arabic name":"كفتة حاتي - كبير مع موتزاريلا","Description":"","Price":"95","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Kofta Haty – Large","Arabic name":"كفتة حاتي - كبير","Description":"","Price":"85","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Kofta Haty – Small w/ Mozzarella","Arabic name":"كفتة حاتي - صغير مع موتزاريلا","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Kofta Haty – Small","Arabic name":"كفتة حاتي - صغير","Description":"","Price":"70","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Shawerma – Large w/ Mozzarella","Arabic name":"شاورمة لحمة - كبير مع موتزاريلا","Description":"","Price":"150","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Shawerma – Large","Arabic name":"شاورمة لحمة - كبير","Description":"","Price":"140","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Beef Shawerma – Small w/ Mozzarella","Arabic name":"شاورمة لحمة - صغير مع موتزاريلا","Description":"","Price":"130","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Doner Kebab – Large w/ Mozzarella","Arabic name":"دونر كباب - كبير مع موتزاريلا","Description":"","Price":"155","Status":"Available","Photo link":""},{"Category":"Meat Krip","Name":"Doner Kebab – Small w/ Mozzarella","Arabic name":"دونر كباب - صغير مع موتزاريلا","Description":"","Price":"135","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Chicken Pane – Large w/ Mozzarella","Arabic name":"فراخ بانية ناجتس - كبير مع موتزاريلا","Description":"","Price":"90","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Chicken Pane – Large","Arabic name":"فراخ بانية ناجتس - كبير","Description":"","Price":"80","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Chicken Pane – Small w/ Mozzarella","Arabic name":"فراخ بانية ناجتس - صغير مع موتزاريلا","Description":"","Price":"75","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Chicken Pane – Small","Arabic name":"فراخ بانية ناجتس - صغير","Description":"","Price":"65","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Shish Tawook – Large w/ Mozzarella","Arabic name":"شيش طاووك - كبير مع موتزاريلا","Description":"","Price":"155","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Shish Tawook – Large","Arabic name":"شيش طاووك - كبير","Description":"","Price":"145","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Shish Tawook – Small w/ Mozzarella","Arabic name":"شيش طاووك - صغير مع موتزاريلا","Description":"","Price":"135","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Crispy Chicken – Large w/ Mozzarella","Arabic name":"كرسبي - كبير مع موتزاريلا","Description":"","Price":"145","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Crispy Chicken – Large","Arabic name":"كرسبي - كبير","Description":"","Price":"130","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Crispy Chicken – Small w/ Mozzarella","Arabic name":"كرسبي - صغير مع موتزاريلا","Description":"","Price":"125","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Chicken Shawerma – Large w/ Mozzarella","Arabic name":"شاورما فراخ - كبير مع موتزاريلا","Description":"","Price":"145","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Chicken Shawerma – Large","Arabic name":"شاورما فراخ - كبير","Description":"","Price":"130","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Chicken Shawerma – Small w/ Mozzarella","Arabic name":"شاورما فراخ - صغير مع موتزاريلا","Description":"","Price":"125","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Cordon Bleu – Large w/ Mozzarella","Arabic name":"كوردن بلو - كبير مع موتزاريلا","Description":"Crispy + Hotdog + Smoked Turkey + Cheddar + Egg + Mozzarella","Price":"145","Status":"Available","Photo link":""},{"Category":"Chicken Krip","Name":"Cordon Bleu – Small w/ Mozzarella","Arabic name":"كوردن بلو - صغير مع موتزاريلا","Description":"Crispy + Hotdog + Smoked Turkey + Cheddar + Egg + Mozzarella","Price":"125","Status":"Available","Photo link":""}].map(normalizeRow);
+
+function showNotice(text){
+  const n = document.getElementById('notice');
+  n.textContent = text;
+  n.style.display = 'block';
+}
+
+async function loadMenu(){
+  if(!SHEET_CSV_URL || SHEET_CSV_URL.indexOf('PASTE_YOUR') === 0){
+    rows = FALLBACK_ROWS;
+    showNotice('Showing the saved menu — paste your published Google Sheet CSV link into SHEET_CSV_URL at the top of this file to go live.');
+    renderMenu();
+    return;
+  }
+  try{
+    const res = await fetch(SHEET_CSV_URL, {cache:'no-store'});
+    if(!res.ok) throw new Error('bad response');
+    const csv = await res.text();
+    rows = csvToObjects(csv);
+    if(!rows.length) throw new Error('empty sheet');
+    renderMenu();
+  }catch(err){
+    rows = FALLBACK_ROWS;
+    showNotice('Could not load the live menu right now — showing the last known menu. Check that the Google Sheet is still published to the web.');
+    renderMenu();
+  }
+}
+
+loadMenu();
+</script>
+</body>
+</html>
